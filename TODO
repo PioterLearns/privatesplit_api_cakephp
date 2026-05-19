@@ -1,0 +1,3 @@
+ - Removed <ini name="apc.enable_cli" value="1"/> from phpunit.xml.dist, as it was causing warnings.
+ For now I set it permanently in my .ini
+ - Table tests

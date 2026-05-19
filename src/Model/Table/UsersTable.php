@@ -47,8 +47,19 @@ class UsersTable extends Table
 
         $this->addBehavior('Timestamp');
 
+        $this->hasMany('PrimaryBuckets', [
+            'className'  => 'Buckets',
+            'foreignKey' => 'bucket_id',
+            'dependent' => true,
+        ]);
+        $this->hasMany('SecondaryBuckets', [
+            'className'  => 'Buckets',
+            'foreignKey' => 'bucket_id',
+            'dependent' => true,
+        ]);
         $this->hasMany('Droplets', [
             'foreignKey' => 'user_id',
+            'dependent' => true,
         ]);
     }
 
@@ -61,14 +72,15 @@ class UsersTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->scalar('username')
+            ->ascii('username')
             ->maxLength('username', 255)
             ->requirePresence('username', 'create')
             ->notEmptyString('username')
+            //todo read-up on https://book.cakephp.org/5.x/orm/validation.html#validation-providers ('provider' => 'table'?)
             ->add('username', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
-            ->scalar('password')
+            ->ascii('password')
             ->maxLength('password', 255)
             ->requirePresence('password', 'create')
             ->notEmptyString('password');

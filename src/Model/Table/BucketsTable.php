@@ -47,8 +47,23 @@ class BucketsTable extends Table
 
         $this->addBehavior('Timestamp');
 
+        //todo "Target table can be inferred by its name, which is provided in the
+        //     * first argument, or you can either pass the to be instantiated or
+        //     * an instance of it directly."
+        // sure is a sentence:D Consider fixing that upstream as well
+        $this->belongsTo('PrimaryUsers', [
+            'className'  => 'Users',
+            'foreignKey' => 'user_primary_id',
+            'joinType' => 'INNER',
+        ]);
+        $this->belongsTo('SecondaryUsers', [
+            'className'  => 'Users',
+            'foreignKey' => 'user_secondary_id',
+            'joinType' => 'INNER',
+        ]);
         $this->hasMany('Droplets', [
             'foreignKey' => 'bucket_id',
+            'dependent' => true,
         ]);
     }
 
@@ -71,19 +86,21 @@ class BucketsTable extends Table
             ->notEmptyString('user_secondary_id');
 
         $validator
-            ->scalar('name')
+            ->ascii('name')
             ->maxLength('name', 255)
             ->requirePresence('name', 'create')
             ->notEmptyString('name');
 
+        //no plans to enforce any currency rules for now = no additional validation
         $validator
-            ->scalar('balance')
+            ->numeric('balance')
             ->maxLength('balance', 255)
             ->notEmptyString('balance');
 
         $validator
-            ->scalar('primary_user_share_percent')
-            ->maxLength('primary_user_share_percent', 255)
+            ->integer('primary_user_share_percent')
+            ->greaterThanOrEqual('primary_user_share_percent', 0)
+            ->lessThanOrEqual('primary_user_share_percent', 100)
             ->notEmptyString('primary_user_share_percent');
 
         return $validator;

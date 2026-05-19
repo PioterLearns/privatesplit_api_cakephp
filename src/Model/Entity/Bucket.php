@@ -31,13 +31,6 @@ class Bucket extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'user_primary_id' => true,
-        'user_secondary_id' => true,
         'name' => true,
-        'balance' => true,
-        'primary_user_share_percent' => true,
-        'created' => true,
-        'modified' => true,
-        'droplets' => true,
     ];
 }

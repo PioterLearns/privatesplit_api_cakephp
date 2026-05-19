@@ -75,13 +75,13 @@ class DropletsTable extends Table
             ->notEmptyString('user_id');
 
         $validator
-            ->scalar('name')
+            ->ascii('name')
             ->maxLength('name', 255)
             ->requirePresence('name', 'create')
             ->notEmptyString('name');
 
         $validator
-            ->scalar('amount')
+            ->numeric('amount')
             ->maxLength('amount', 255)
             ->requirePresence('amount', 'create')
             ->notEmptyString('amount');
