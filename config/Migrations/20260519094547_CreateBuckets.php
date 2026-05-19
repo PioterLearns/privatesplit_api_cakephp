@@ -17,6 +17,7 @@ class CreateBuckets extends BaseMigration
      */
     public function change(): void
     {
+        //todo FKs?
         $table = $this->table('buckets');
         $table->addColumn('id', 'integer', [
             'autoIncrement' => true,
@@ -24,6 +25,9 @@ class CreateBuckets extends BaseMigration
             'limit' => 11,
             'null' => false,
         ]);
+        //todo: user_primary_id and user_secondary_id break Cake's naming convention!
+        //      Because they both point at Users, the convention of using user_id as FK can't be applied.
+        //      At least not without re-structuring the design. We'll see if it's an issue later.
         $table->addColumn('user_primary_id', 'integer', [
             'default' => null,
             'limit' => 11,

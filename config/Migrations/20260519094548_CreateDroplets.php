@@ -17,6 +17,7 @@ class CreateDroplets extends BaseMigration
      */
     public function change(): void
     {
+        //todo FKs?
         $table = $this->table('droplets');
         $table->addColumn('id', 'integer', [
             'autoIncrement' => true,
@@ -29,6 +30,8 @@ class CreateDroplets extends BaseMigration
             'limit' => 11,
             'null' => false,
         ]);
+        //todo: decided to stick to conventions here, since there was no technical conflict.
+        //      I'm not exactly happy with less descriptive 'user_id' and would personally prefer 'payer_id'
         $table->addColumn('user_id', 'integer', [
             'default' => null,
             'limit' => 11,

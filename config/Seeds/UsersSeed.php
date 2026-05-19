@@ -20,7 +20,23 @@ class UsersSeed extends BaseSeed
      */
     public function run(): void
     {
-        $data = [];
+        //tutorial said to temporarily use plaintext for passwords, but I don't support blasphemy!
+        $data = [
+            [
+                'id' => 1,
+                'username' => 'Alice',
+                'password' => password_hash('secret', PASSWORD_DEFAULT),
+                'created' => date('Y-m-d H:i:s'),
+                'modified' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'id' => 2,
+                'username' => 'Bob',
+                'password' => password_hash('notsosecret', PASSWORD_DEFAULT),
+                'created' => date('Y-m-d H:i:s'),
+                'modified' => date('Y-m-d H:i:s'),
+            ],
+        ];
 
         $table = $this->table('users');
         $table->insert($data)->save();
