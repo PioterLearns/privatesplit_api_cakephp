@@ -8,7 +8,8 @@
         "cakephp/cakephp": "5.3.*",
         "cakephp/migrations": "^5.0",
         "cakephp/plugin-installer": "^2.0",
-        "mobiledetect/mobiledetectlib": "^4.8.03"
+        "mobiledetect/mobiledetectlib": "^4.8.03",
+        "ext-bcmath": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",

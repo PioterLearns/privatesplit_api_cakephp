@@ -62,7 +62,7 @@ class BucketsTable extends Table
             'joinType' => 'INNER',
         ]);
         $this->hasMany('Droplets', [
-            'foreignKey' => 'bucket_id',
+            'foreignKey' => 'id',
             'dependent' => true,
         ]);
     }

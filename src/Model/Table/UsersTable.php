@@ -49,16 +49,16 @@ class UsersTable extends Table
 
         $this->hasMany('PrimaryBuckets', [
             'className'  => 'Buckets',
-            'foreignKey' => 'bucket_id',
+            'foreignKey' => 'user_primary_id',
             'dependent' => true,
         ]);
         $this->hasMany('SecondaryBuckets', [
             'className'  => 'Buckets',
-            'foreignKey' => 'bucket_id',
+            'foreignKey' => 'user_secondary_id',
             'dependent' => true,
         ]);
         $this->hasMany('Droplets', [
-            'foreignKey' => 'user_id',
+            'foreignKey' => 'id',
             'dependent' => true,
         ]);
     }

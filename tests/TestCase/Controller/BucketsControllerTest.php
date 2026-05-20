@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Test\TestCase\Controller;
@@ -23,9 +24,7 @@ class BucketsControllerTest extends TestCase
      */
     protected array $fixtures = [
         'app.Buckets',
-        'app.PrimaryUsers',
-        'app.SecondaryUsers',
-        'app.Droplets',
+        'app.Users',
     ];
 
     /**
@@ -34,9 +33,33 @@ class BucketsControllerTest extends TestCase
      * @return void
      * @link \App\Controller\BucketsController::index()
      */
-    public function testIndex(): void
+    public function testIndex_correctSessionProvided_responseOK(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+
+        $this->get('/buckets/');
+
+        $this->assertResponseOk();
+    }
+
+    public function testIndex_secondaryUserSessionProvided_responseOK(): void
     {
         $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    public function testIndex_incorrectSessionProvided_response401(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+
+        $this->get('/buckets/');
+
+        $this->assertResponseCode(401);
     }
 
     /**
@@ -45,9 +68,48 @@ class BucketsControllerTest extends TestCase
      * @return void
      * @link \App\Controller\BucketsController::view()
      */
-    public function testView(): void
+    public function testView_primaryUserSessionProvided_responseOK(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $id = 1;
+
+        $this->get('/buckets/view/' . $id);
+
+        $this->assertResponseOk();
+    }
+
+    public function testView_secondaryUserSessionProvided_responseOK(): void
     {
         $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    public function testView_unauthorizedUserSessionProvided_responseForbidden(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $id = 1;
+
+        $this->get('/buckets/view/' . $id);
+
+        $this->assertResponseCode(403, "Unauthorized access to Bucket");
+    }
+
+    public function testView_invalidSessionProvided_responseUnauthorized(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $id = 1;
+
+        $this->get('/buckets/view/' . $id);
+
+        $this->assertResponseCode(401, "Unauthorized access to Bucket");
     }
 
     /**
@@ -56,30 +118,35 @@ class BucketsControllerTest extends TestCase
      * @return void
      * @link \App\Controller\BucketsController::add()
      */
-    public function testAdd(): void
+    public function testAdd_correctDataProvided_responseOK(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $dataToAdd = [
+            'user_primary_id' => 1,//todo move to session
+            'user_secondary_id' => 2,
+            'name' => 'someName',
+        ];
+
+        $this->post('/buckets/add', $dataToAdd);
+
+        $this->assertResponseOk();
     }
 
-    /**
-     * Test edit method
-     *
-     * @return void
-     * @link \App\Controller\BucketsController::edit()
-     */
-    public function testEdit(): void
+    public function testAdd_sameUserIdInSecondary_response400(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $dataToAdd = [
+            'user_primary_id' => 1,//todo move to session
+            'user_secondary_id' => 1,
+            'name' => 'someName',
+        ];
 
-    /**
-     * Test delete method
-     *
-     * @return void
-     * @link \App\Controller\BucketsController::delete()
-     */
-    public function testDelete(): void
-    {
-        $this->markTestIncomplete('Not implemented yet.');
+        $this->post('/buckets/add', $dataToAdd);
+
+        $this->assertResponseCode(400, "Cannot share a bucket with yourself");
     }
 }

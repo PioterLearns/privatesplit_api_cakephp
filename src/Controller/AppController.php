@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\View\JsonView;
 
 /**
  * Application Controller
@@ -48,5 +49,10 @@ class AppController extends Controller
          * see https://book.cakephp.org/5/en/controllers/components/form-protection.html
          */
         //$this->loadComponent('FormProtection');
+    }
+
+    public function viewClasses(): array
+    {
+        return [JsonView::class];
     }
 }

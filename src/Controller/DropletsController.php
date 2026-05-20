@@ -1,7 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
+
+use App\Model\Entity\Droplet;
 
 /**
  * Droplets Controller
@@ -10,19 +13,6 @@ namespace App\Controller;
  */
 class DropletsController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
-    public function index()
-    {
-        $query = $this->Droplets->find()
-            ->contain(['Buckets', 'Users']);
-        $droplets = $this->paginate($query);
-
-        $this->set(compact('droplets'));
-    }
 
     /**
      * View method
@@ -33,73 +23,60 @@ class DropletsController extends AppController
      */
     public function view($id = null)
     {
-        $droplet = $this->Droplets->get($id, contain: ['Buckets', 'Users']);
-        $this->set(compact('droplet'));
+        //todo auth
+        $this->set('droplet', $this->Droplets->get($id, contain: ['Buckets', 'Users']));
+        $this->viewBuilder()->setOption('serialize', 'droplet');
     }
 
     /**
      * Add method
      *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response|null|void
      */
     public function add()
     {
+        //todo auth; validation
         $droplet = $this->Droplets->newEmptyEntity();
+        $droplet->setAccess('user_id', true);
+        $droplet->setAccess('bucket_id', true);
+        $droplet->setAccess('expense', true);
         if ($this->request->is('post')) {
-            $droplet = $this->Droplets->patchEntity($droplet, $this->request->getData());
+            $data = $this->request->getData();
+            $droplet = $this->Droplets->patchEntity($droplet, $data);
             if ($this->Droplets->save($droplet)) {
-                $this->Flash->success(__('The droplet has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+                //todo db transactions?
+                $this->bucketBalanceAdjustment($droplet);
+                //todo add new balance to response?
+                $this->set('droplet', $droplet);
+                $this->viewBuilder()->setOption('serialize', 'droplet');
             }
-            $this->Flash->error(__('The droplet could not be saved. Please, try again.'));
+            //todo error handling needs custom views?
         }
-        $buckets = $this->Droplets->Buckets->find('list', limit: 200)->all();
-        $users = $this->Droplets->Users->find('list', limit: 200)->all();
-        $this->set(compact('droplet', 'buckets', 'users'));
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Droplet id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
+    //todo this is vulnerable to off-by-one errors, but since this is a framework learning project,
+    // and it doesn't matter for my personal use case I'll leave it as is
+    private function bucketBalanceAdjustment(Droplet $droplet): void
     {
-        $droplet = $this->Droplets->get($id, contain: []);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $droplet = $this->Droplets->patchEntity($droplet, $this->request->getData());
-            if ($this->Droplets->save($droplet)) {
-                $this->Flash->success(__('The droplet has been saved.'));
+        bcscale(0);//todo add support for arbitrary precision
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The droplet could not be saved. Please, try again.'));
+        $bucket = $this->Droplets->Buckets->get($droplet->bucket_id);
+
+        //todo this could probably be added to the Droplet as a dynamic field
+        $payerIsPrimary = $bucket->user_primary_id === $droplet->user_id;
+
+        //it would probably be more readable to put this in a series of if/else statements, but this is more fun:P
+        $amountModifier = $bucket->primary_user_share_percent;
+        $amountModifier = $payerIsPrimary ? $amountModifier : 100 - $amountModifier;
+        $amountModifier = $droplet->expense ? $amountModifier : "100";
+        $amountModifier = $payerIsPrimary ? $amountModifier : "-" . $amountModifier;
+        $amountDiff = bcdiv(bcmul($amountModifier, $droplet->amount), "100");
+        $newBalance = bcadd($bucket->balance, $amountDiff);
+
+        $bucket->setAccess('balance', true);
+        $this->Droplets->Buckets->patchEntity($bucket, ['balance' => $newBalance]);
+        if (false === $this->Droplets->Buckets->save($bucket)) {
+            //todo rollback non-existing transaction ;)
         }
-        $buckets = $this->Droplets->Buckets->find('list', limit: 200)->all();
-        $users = $this->Droplets->Users->find('list', limit: 200)->all();
-        $this->set(compact('droplet', 'buckets', 'users'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Droplet id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $droplet = $this->Droplets->get($id);
-        if ($this->Droplets->delete($droplet)) {
-            $this->Flash->success(__('The droplet has been deleted.'));
-        } else {
-            $this->Flash->error(__('The droplet could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
     }
 }

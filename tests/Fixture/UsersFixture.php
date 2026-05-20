@@ -20,10 +20,17 @@ class UsersFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
-                'username' => 'Lorem ipsum dolor sit amet',
-                'password' => 'Lorem ipsum dolor sit amet',
-                'created' => '2026-05-19 13:42:58',
-                'modified' => '2026-05-19 13:42:58',
+                'username' => 'Alice',
+                'password' => password_hash('secret', PASSWORD_DEFAULT),
+                'created' => '2026-01-01 00:00:00',
+                'modified' => '2026-01-01 00:00:00',
+            ],
+            [
+                'id' => 2,
+                'username' => 'Bob',
+                'password' => password_hash('notsosecret', PASSWORD_DEFAULT),
+                'created' => '2026-01-01 00:00:00',
+                'modified' => '2026-01-01 00:00:00',
             ],
         ];
         parent::init();

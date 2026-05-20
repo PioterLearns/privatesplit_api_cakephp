@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Test\TestCase\Controller;
@@ -28,25 +29,53 @@ class DropletsControllerTest extends TestCase
     ];
 
     /**
-     * Test index method
-     *
-     * @return void
-     * @link \App\Controller\DropletsController::index()
-     */
-    public function testIndex(): void
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
-
-    /**
      * Test view method
      *
      * @return void
      * @link \App\Controller\DropletsController::view()
      */
-    public function testView(): void
+    public function testView_primaryUserSessionProvided_responseOK(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $id = 1;
+
+        $this->get('/droplets/view/' . $id);
+
+        $this->assertResponseOk();
+    }
+
+    public function testView_secondaryUserSessionProvided_responseOK(): void
     {
         $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    public function testView_unauthorizedUserSessionProvided_responseForbidden(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $id = 1;
+
+        $this->get('/droplets/view/' . $id);
+
+        $this->assertResponseCode(403, "Unauthorized access to Bucket");
+    }
+
+    public function testView_invalidSessionProvided_responseUnauthorized(): void
+    {
+        //todo provide session
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $id = 1;
+
+        $this->get('/droplets/view/' . $id);
+
+        $this->assertResponseCode(401, "Unauthorized access to Bucket");
     }
 
     /**
@@ -55,9 +84,110 @@ class DropletsControllerTest extends TestCase
      * @return void
      * @link \App\Controller\DropletsController::add()
      */
-    public function testAdd(): void
+    public function testAdd_correctDataProvided_dropletAdded(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $dataToAdd = [
+            'user_id' => 1,//todo move to session
+            'bucket_id' => 1,
+            'name' => 'someName',
+            'amount' => 2,
+            'expense' => 1
+        ];
+
+        $this->post('/droplets/add', $dataToAdd);
+
+        $this->assertResponseOk();
+    }
+
+    public function testAdd_primaryUserAddedExpense_amountProportionallyIncreasesBucketBalance(): void
+    {
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $dataToAdd = [
+            'user_id' => 1,//todo move to session
+            'bucket_id' => 1,
+            'name' => 'someName',
+            'amount' => 2,
+            'expense' => 1
+        ];
+
+        $this->post('/droplets/add', $dataToAdd);
+
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $this->get('/buckets/view/' . $dataToAdd['bucket_id']);
+        $this->assertEquals("1", json_decode($this->_getBodyAsString(), true)['balance']);
+    }
+
+    public function testAdd_primaryUserAddedRepayment_amountFullyIncreasesBucketBalance(): void
+    {
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $dataToAdd = [
+            'user_id' => 1,//todo move to session
+            'bucket_id' => 1,
+            'name' => 'someName',
+            'amount' => 2,
+            'expense' => 0
+        ];
+
+        $this->post('/droplets/add', $dataToAdd);
+
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $this->get('/buckets/view/' . $dataToAdd['bucket_id']);
+        $this->assertEquals("2", json_decode($this->_getBodyAsString(), true)['balance']);
+    }
+
+    public function testAdd_secondaryUserAddedExpense_amountProportionallyDecreasesBucketBalance(): void
+    {
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $dataToAdd = [
+            'user_id' => 2,//todo move to session
+            'bucket_id' => 1,
+            'name' => 'someName',
+            'amount' => 2,
+            'expense' => 1
+        ];
+
+        $this->post('/droplets/add', $dataToAdd);
+
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $this->get('/buckets/view/' . $dataToAdd['bucket_id']);
+        $this->assertEquals("-1", json_decode($this->_getBodyAsString(), true)['balance']);
+    }
+
+    public function testAdd_secondaryUserAddedRepayment_amountFullyDecreasesBucketBalance(): void
+    {
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $dataToAdd = [
+            'user_id' => 2,//todo move to session
+            'bucket_id' => 1,
+            'name' => 'someName',
+            'amount' => 2,
+            'expense' => 0
+        ];
+
+        $this->post('/droplets/add', $dataToAdd);
+
+        $this->configRequest([
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        $this->get('/buckets/view/' . $dataToAdd['bucket_id']);
+        $this->assertEquals("-2", json_decode($this->_getBodyAsString(), true)['balance']);
     }
 
     /**

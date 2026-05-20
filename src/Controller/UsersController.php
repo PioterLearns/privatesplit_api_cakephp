@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -10,91 +11,39 @@ namespace App\Controller;
  */
 class UsersController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
-    public function index()
-    {
-        $query = $this->Users->find();
-        $users = $this->paginate($query);
-
-        $this->set(compact('users'));
-    }
 
     /**
-     * View method
+     * Me method
      *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null|void Renders view
+     * @return \Cake\Http\Response|null|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    public function me()
     {
-        $user = $this->Users->get($id, contain: ['PrimaryBuckets', 'SecondaryBuckets', 'Droplets']);
-        $this->set(compact('user'));
+        $id = 1;//todo replace with session authenticated id
+        $this->set('user', $this->Users->get($id, contain: ['PrimaryBuckets', 'SecondaryBuckets', 'Droplets']));
+        $this->viewBuilder()->setOption('serialize', 'user');
     }
 
     /**
      * Add method
      *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response|null|void
      */
     public function add()
     {
+        //todo I don't get why this is created if !post, but I'll think about it later
+        //todo validation
         $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $data = $this->request->getData();
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+            $user = $this->Users->patchEntity($user, $data);
             if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+                $this->set('user', $user);
+                $this->viewBuilder()->setOption('serialize', 'user');
             }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            //todo error handling needs custom views?
         }
-        $this->set(compact('user'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $user = $this->Users->get($id, contain: []);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
-        }
-        $this->set(compact('user'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $user = $this->Users->get($id);
-        if ($this->Users->delete($user)) {
-            $this->Flash->success(__('The user has been deleted.'));
-        } else {
-            $this->Flash->error(__('The user could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
     }
 }

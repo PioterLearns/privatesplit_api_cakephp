@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Test\TestCase\Model\Table;
@@ -25,7 +26,6 @@ class UsersTableTest extends TestCase
      */
     protected array $fixtures = [
         'app.Users',
-        'app.Droplets',
     ];
 
     /**
@@ -58,9 +58,41 @@ class UsersTableTest extends TestCase
      * @return void
      * @link \App\Model\Table\UsersTable::validationDefault()
      */
-    public function testValidationDefault(): void
+    public function testValidation_dataIsValid_createdWithoutErrors(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $validData = [
+            'username' => 'newuser',
+            'password' => 'pass',
+        ];
+
+        $user = $this->Users->newEmptyEntity();
+        $user = $this->Users->patchEntity($user, $validData);
+
+        $this->assertFalse($user->hasErrors(), 'User entity has errors');
+    }
+
+    public function testValidation_usernameNotProvided_hasUsernameError(): void
+    {
+        $data = [
+            'password' => 'pass',
+        ];
+
+        $user = $this->Users->newEmptyEntity();
+        $user = $this->Users->patchEntity($user, $data);
+
+        $this->assertArrayHasKey('username', $user->getErrors(), 'Username is required');
+    }
+
+    public function testValidation_passwordNotProvided_hasPasswordError(): void
+    {
+        $data = [
+            'username' => 'newuser',
+        ];
+
+        $user = $this->Users->newEmptyEntity();
+        $user = $this->Users->patchEntity($user, $data);
+
+        $this->assertArrayHasKey('password', $user->getErrors(), 'Password is required');
     }
 
     /**
@@ -69,8 +101,29 @@ class UsersTableTest extends TestCase
      * @return void
      * @link \App\Model\Table\UsersTable::buildRules()
      */
-    public function testBuildRules(): void
+    public function testBuildRules_usernameIsUnique_hasNoErrors(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $data = [
+            'username' => 'newuser',
+            'password' => 'pass',
+        ];
+
+        $user = $this->Users->newEmptyEntity();
+        $user = $this->Users->patchEntity($user, $data);
+
+        $this->assertEmpty($user->hasErrors(), 'User entity has errors');
+    }
+
+    public function testBuildRules_usernameAlreadyExists_hasUsernameError(): void
+    {
+        $data = [
+            'username' => 'Alice',//from Fixture
+            'password' => 'pass',
+        ];
+
+        $user = $this->Users->newEmptyEntity();
+        $user = $this->Users->patchEntity($user, $data);
+
+        $this->assertArrayHasKey('username', $user->getErrors(), 'Username must be unique');
     }
 }

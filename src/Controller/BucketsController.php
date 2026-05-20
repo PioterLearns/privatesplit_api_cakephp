@@ -13,93 +13,53 @@ class BucketsController extends AppController
     /**
      * Index method
      *
-     * @return \Cake\Http\Response|null|void Renders view
+     * @return \Cake\Http\Response|null|void
      */
     public function index()
     {
-        $query = $this->Buckets->find()
-            ->contain(['PrimaryUsers', 'SecondaryUsers']);
-        $buckets = $this->paginate($query);
-
-        $this->set(compact('buckets'));
+        //todo auth->filter
+        $this->set('buckets', $this->Buckets->find()->contain(['PrimaryUsers', 'SecondaryUsers']));
+        $this->viewBuilder()->setOption('serialize', 'buckets');
     }
 
     /**
      * View method
      *
      * @param string|null $id Bucket id.
-     * @return \Cake\Http\Response|null|void Renders view
+     * @return \Cake\Http\Response|null|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function view($id = null)
     {
-        $bucket = $this->Buckets->get($id, contain: ['PrimaryUsers', 'SecondaryUsers', 'Droplets']);
-        $this->set(compact('bucket'));
+        //todo auth
+        $this->set('bucket', $this->Buckets->get($id, contain: ['PrimaryUsers', 'SecondaryUsers', 'Droplets']));
+        $this->viewBuilder()->setOption('serialize', 'bucket');
     }
 
     /**
      * Add method
      *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response|null|void
      */
     public function add()
     {
+        //todo auth
+        //todo validate
         $bucket = $this->Buckets->newEmptyEntity();
+        //todo research $_accessible a bit more. I think I saw some sort of "don't apply when new" somewhere in docs
+        $bucket->setAccess('user_primary_id', true);
+        $bucket->setAccess('user_secondary_id', true);
         if ($this->request->is('post')) {
             $bucket = $this->Buckets->patchEntity($bucket, $this->request->getData());
             if ($this->Buckets->save($bucket)) {
-                $this->Flash->success(__('The bucket has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+                $this->set('bucket', $bucket);
+                $this->viewBuilder()->setOption('serialize', 'bucket');
             }
-            $this->Flash->error(__('The bucket could not be saved. Please, try again.'));
+            //todo error handling
         }
-        $primaryUsers = $this->Buckets->PrimaryUsers->find('list', limit: 200)->all();
-        $secondaryUsers = $this->Buckets->SecondaryUsers->find('list', limit: 200)->all();
-        $this->set(compact('bucket', 'primaryUsers', 'secondaryUsers'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Bucket id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $bucket = $this->Buckets->get($id, contain: []);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $bucket = $this->Buckets->patchEntity($bucket, $this->request->getData());
-            if ($this->Buckets->save($bucket)) {
-                $this->Flash->success(__('The bucket has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The bucket could not be saved. Please, try again.'));
-        }
-        $primaryUsers = $this->Buckets->PrimaryUsers->find('list', limit: 200)->all();
-        $secondaryUsers = $this->Buckets->SecondaryUsers->find('list', limit: 200)->all();
-        $this->set(compact('bucket', 'primaryUsers', 'secondaryUsers'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Bucket id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $bucket = $this->Buckets->get($id);
-        if ($this->Buckets->delete($bucket)) {
-            $this->Flash->success(__('The bucket has been deleted.'));
-        } else {
-            $this->Flash->error(__('The bucket could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        //todo add user data to response
+//        $primaryUsers = $this->Buckets->PrimaryUsers->find('list', limit: 200)->all();
+//        $secondaryUsers = $this->Buckets->SecondaryUsers->find('list', limit: 200)->all();
+//        $this->set(compact('bucket', 'primaryUsers', 'secondaryUsers'));
     }
 }
