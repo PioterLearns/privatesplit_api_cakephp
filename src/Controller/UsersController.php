@@ -36,9 +36,7 @@ class UsersController extends AppController
         //todo validation
         $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
-            $data = $this->request->getData();
-            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-            $user = $this->Users->patchEntity($user, $data);
+            $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
                 $this->set('user', $user);
                 $this->viewBuilder()->setOption('serialize', 'user');
