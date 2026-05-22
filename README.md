@@ -20,5 +20,5 @@ Roadmap:
 - [ ] 1.0 Multi-user Bucket support - Deadline: at some point. Maybe;)
 
 Possible connected projects for future:
-~~1. Proper Web client (second attempt at learning proper frontend)~~ (Already planned)
+1. ~~Proper Web client (second attempt at learning proper frontend)~~ (Already planned)
 2. Android client (learning Kotlin)
