@@ -13,7 +13,7 @@ Roadmap:
  - GPG encryption for data (see [ADR-001](https://github.com/PioterLearns/privatesplit_api_cakephp/blob/roadmap-update/design/ADR/001.EncryptionScope.md))
  - Data migration for encrypted
  - (optional) Deploy test server
-- [ ] 0.3 Frontend readiness - Deadline: 2026-06-03 (Wed)
+- [ ] 0.3 Frontend readiness - Deadline: 2026-06-03? (Wed)
  - Add missing CRUD methods
  - Produce OpenAPI documentation
  - Commence work on frontend - heavily AI supported JS project. (I'm not very comfortable using AI for technology I don't know, but I am here to learn, so might as well give it a try)
