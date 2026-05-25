@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Model\Table;
@@ -48,19 +49,37 @@ class UsersTable extends Table
         $this->addBehavior('Timestamp');
 
         $this->hasMany('PrimaryBuckets', [
-            'className'  => 'Buckets',
+            'className' => 'Buckets',
             'foreignKey' => 'user_primary_id',
             'dependent' => true,
         ]);
         $this->hasMany('SecondaryBuckets', [
-            'className'  => 'Buckets',
+            'className' => 'Buckets',
             'foreignKey' => 'user_secondary_id',
             'dependent' => true,
         ]);
         $this->hasMany('Droplets', [
-            'foreignKey' => 'id',
+            'foreignKey' => 'user_id',
             'dependent' => true,
         ]);
+        $this->hasMany('Sessions', [
+            'foreignKey' => 'user_id',
+            'dependent' => true,
+        ]);
+    }
+
+    public function findBySessionToken(SelectQuery $query, string $token): SelectQuery
+    {
+        return $query
+            ->select(['Users.id'])
+            ->join([
+                'Sessions' => [
+                    'table' => 'sessions',
+                    'type' => 'INNER',
+                    'conditions' => 'Sessions.user_id = Users.id',
+                ],
+            ])
+            ->where(['Sessions.token' => $token]);
     }
 
     /**

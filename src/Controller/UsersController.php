@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Utility\Security;
+
 /**
  * Users Controller
  *
@@ -11,6 +13,13 @@ namespace App\Controller;
  */
 class UsersController extends AppController
 {
+
+    public function beforeFilter(\Cake\Event\EventInterface $event): void
+    {
+        parent::beforeFilter($event);
+
+        $this->Authentication->allowUnauthenticated(['register']);
+    }
 
     /**
      * Me method
@@ -20,17 +29,17 @@ class UsersController extends AppController
      */
     public function me()
     {
-        $id = 1;//todo replace with session authenticated id
-        $this->set('user', $this->Users->get($id, contain: ['PrimaryBuckets', 'SecondaryBuckets', 'Droplets']));
+        $user = $this->request->getAttribute('identity');
+        $this->set('user', $this->Users->get($user->id, contain: ['PrimaryBuckets', 'SecondaryBuckets', 'Droplets']));
         $this->viewBuilder()->setOption('serialize', 'user');
     }
 
     /**
-     * Add method
+     * Register method
      *
      * @return \Cake\Http\Response|null|void
      */
-    public function add()
+    public function register()
     {
         //todo I don't get why this is created if !post, but I'll think about it later
         //todo validation
@@ -42,6 +51,29 @@ class UsersController extends AppController
                 $this->viewBuilder()->setOption('serialize', 'user');
             }
             //todo error handling needs custom views?
+        }
+    }
+
+    /**
+     * Login method
+     *
+     * @return \Cake\Http\Response|null|void
+     */
+    public function login()
+    {
+        $result = $this->Authentication->getResult();
+        if ($result && $result->isValid()) {
+            $user = $this->request->getAttribute('identity');
+            $session = $this->Users->Sessions->newEmptyEntity();
+            $session->setAccess('user_id', true);
+            $this->Users->Sessions->patchEntity($session, [
+                'token' => Security::randomString(),
+                'user_id' => $user->id
+            ]);
+            if ($this->Users->Sessions->save($session)) {
+                $this->set('session', $session);
+                $this->viewBuilder()->setOption('serialize', 'session');
+            }
         }
     }
 }

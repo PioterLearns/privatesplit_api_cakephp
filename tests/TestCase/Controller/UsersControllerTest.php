@@ -24,6 +24,7 @@ class UsersControllerTest extends TestCase
      */
     protected array $fixtures = [
         'app.Users',
+        'app.Sessions',
     ];
 
     /**
@@ -32,11 +33,13 @@ class UsersControllerTest extends TestCase
      * @return void
      * @link \App\Controller\UsersController::view()
      */
-    public function testMe_correctSessionProvided_correctUserIsFetched(): void
+    public function testMe_validAuthenticationProvided_correctUserIsFetched(): void
     {
-        //todo set up Session when it's implemented
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'user1Token'
+            ],
         ]);
         //todo feels silly to me, but that's how they do it in
         // https://book.cakephp.org/6.x/development/testing.html#testing-a-json-responding-controller
@@ -58,12 +61,25 @@ class UsersControllerTest extends TestCase
         $this->assertResponseOk();
         $this->assertEquals($expected, (string)$this->_response->getBody());
     }
+    public function testMe_invalidAuthenticationProvided_responseUnauthorized(): void
+    {
+        $this->configRequest([
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'invalidToken'
+            ],
+        ]);
+
+        $this->get('/users/me');
+
+        $this->assertResponseCode(401);
+    }
 
     /**
-     * Test add method
+     * Test register method
      *
      * @return void
-     * @link \App\Controller\UsersController::add()
+     * @link \App\Controller\UsersController::register()
      */
     public function testAdd_correctDataProvided_responseOK(): void
     {
@@ -75,7 +91,7 @@ class UsersControllerTest extends TestCase
             'password' => 'pass'
         ];
 
-        $this->post('/users/add', $dataToAdd);
+        $this->post('/users/register', $dataToAdd);
 
         $this->assertResponseOk();
     }

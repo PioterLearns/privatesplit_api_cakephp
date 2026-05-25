@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -14,8 +15,10 @@ declare(strict_types=1);
  * @since     3.3.0
  * @license   https://opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace App;
 
+use App\Identifier\Resolver\SessionResolver;
 use App\Middleware\HostHeaderMiddleware;
 use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
@@ -29,6 +32,11 @@ use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use Authentication\AuthenticationService;
+use Authentication\AuthenticationServiceInterface;
+use Authentication\AuthenticationServiceProviderInterface;
+use Authentication\Middleware\AuthenticationMiddleware;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Application setup class.
@@ -38,7 +46,7 @@ use Cake\Routing\Middleware\RoutingMiddleware;
  *
  * @extends \Cake\Http\BaseApplication<\App\Application>
  */
-class Application extends BaseApplication
+class Application extends BaseApplication implements AuthenticationServiceProviderInterface
 {
     /**
      * Load all the application configuration and bootstrap logic.
@@ -87,13 +95,14 @@ class Application extends BaseApplication
             // available as array through $request->getData()
             // https://book.cakephp.org/5/en/controllers/middleware.html#body-parser-middleware
             ->add(new BodyParserMiddleware())
+            ->add(new AuthenticationMiddleware($this));
 
             // Cross Site Request Forgery (CSRF) Protection Middleware
             // https://book.cakephp.org/5/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
 //            ->add(new CsrfProtectionMiddleware([
 //                'httponly' => true,
-//            ])); todo re-enable! Disabled temporarily to not further derail tutorial progress, with upcoming deadline
-;
+//            ])); todo 0.3 re-enable! Disabled temporarily to not further derail tutorial progress, with upcoming deadline
+        ;
         return $middlewareQueue;
     }
 
@@ -122,5 +131,42 @@ class Application extends BaseApplication
         // $eventManager->on(new SomeCustomListenerClass());
 
         return $eventManager;
+    }
+
+    public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface
+    {
+        $service = new AuthenticationService();
+
+        // Define where users should be redirected to when they are not authenticated
+        //todo 0.3 response leaks internal data. Will probably get turned off by some "debug" option for production?
+        $service->setConfig([
+            'unauthenticatedRedirect' => null,
+        ]);
+
+        // Load the authenticators. Session should be first.
+        //todo 0.4 switch to JWT?
+        $service->loadAuthenticator('Authentication.Token', [
+            'header' => 'Authorization',
+            'identifier' => [
+                'className' => 'Authentication.Token',
+                //'hashAlgorithm' => 'sha256' is an option, but meh...
+                'resolver' => [
+                    'className' => SessionResolver::class,
+                ],
+            ],
+        ]);
+        $service->loadAuthenticator('Authentication.Form', [
+            'loginUrl' => [
+                'prefix' => false,
+                'plugin' => null,
+                'controller' => 'Users',
+                'action' => 'login',
+            ],
+            'identifier' => [
+                'className' => 'Authentication.Password',
+            ],
+        ]);
+
+        return $service;
     }
 }
