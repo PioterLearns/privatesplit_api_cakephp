@@ -38,7 +38,7 @@ class UsersControllerTest extends TestCase
         $this->configRequest([
             'headers' => [
                 'Accept' => 'application/json',
-                'Authorization' => 'user1Token'
+                'Authorization' => 'userAToken'
             ],
         ]);
         //todo feels silly to me, but that's how they do it in
@@ -83,8 +83,12 @@ class UsersControllerTest extends TestCase
      */
     public function testAdd_correctDataProvided_responseOK(): void
     {
+
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userAToken',
+            ],
         ]);
         $dataToAdd = [
             'username' => 'newuser',

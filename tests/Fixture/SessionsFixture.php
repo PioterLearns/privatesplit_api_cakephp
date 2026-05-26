@@ -21,13 +21,19 @@ class SessionsFixture extends TestFixture
             [
                 'id' => 1,
                 'user_id' => 2,
-                'token' => 'user2Token',
+                'token' => 'userBToken',
                 'created' => '2026-05-24 13:11:49',
             ],
             [
                 'id' => 2,
                 'user_id' => 1,
-                'token' => 'user1Token',
+                'token' => 'userAToken',
+                'created' => '2026-05-24 13:11:49',
+            ],
+            [
+                'id' => 3,
+                'user_id' => 3,
+                'token' => 'userCToken',
                 'created' => '2026-05-24 13:11:49',
             ],
         ];

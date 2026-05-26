@@ -19,6 +19,7 @@ class UsersController extends AppController
         parent::beforeFilter($event);
 
         $this->Authentication->allowUnauthenticated(['register']);
+        $this->Authorization->skipAuthorization();
     }
 
     /**

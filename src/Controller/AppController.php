@@ -43,6 +43,7 @@ class AppController extends Controller
         parent::initialize();
 
         $this->loadComponent('Authentication.Authentication');
+        $this->loadComponent('Authorization.Authorization');
 
         /* todo check out this form protection
          * Enable the following component for recommended CakePHP form protection settings.
