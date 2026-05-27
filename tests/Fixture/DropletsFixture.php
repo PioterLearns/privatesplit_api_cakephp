@@ -27,6 +27,7 @@ class DropletsFixture extends TestFixture
                 'expense' => 1,
                 'created' => '2026-05-19 13:43:18',
                 'modified' => '2026-05-19 13:43:18',
+                'occurred' => '2026-05-01',
             ],
         ];
         parent::init();

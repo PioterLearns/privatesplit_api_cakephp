@@ -33,6 +33,8 @@ class Droplet extends Entity
      */
     protected array $_accessible = [
         'name' => true,
-        'amount' => true,//todo changing this requires an update in bucket. If we can't force this somehow - remove this
+        'amount' => true,//todo 0.3 changing this requires an update in bucket. If we can't force this somehow - remove this
+        'expense' => true,//todo 0.3 changing this requires an update in bucket. If we can't force this somehow - remove this
+        'occurred' => true,
     ];
 }

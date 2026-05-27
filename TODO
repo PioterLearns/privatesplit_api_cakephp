@@ -7,3 +7,8 @@
  - add some advanced query logic, to play with ORM more
  - go again through https://book.cakephp.org/5.x/tutorials-and-examples/cms/tags-and-users.html as I've pretty much just
     flipped through it, to get to auth part
+
+
+ - refactor the more complex flows (probably as part of adding db transactions)
+ - add tests to Utility tools (move some existing integration tests used to do unit test jobs, like balance checks)
+ - add some negative tests for file upload

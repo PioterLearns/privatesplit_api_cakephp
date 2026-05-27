@@ -1,0 +1,12 @@
+Date,Description,Category,Cost,Currency,primary user,secondary user
+
+2026-05-26,50/50 expense even primary,category,100.00,EUR,50.00,-50.00
+2026-05-26,50/50 expense even secondary,category,100.00,EUR,-50.00,50.00
+2026-05-01,50/50 expense odd secondary,category,101.00,EUR,-50.50,50.50
+2026-05-26,not shared expense,category,100.00,EUR,0.00,0.00
+2026-05-26,100 repayment primary,General,100.00,EUR,100.00,-100.00
+2026-05-26,50/50 expense different currency ,category,100.00,CHF,50.00,-50.00
+
+2026-05-26,Total balance, , ,EUR,49.50,-49.50
+2026-05-26,Total balance, , ,CHF,50.00,-50.00
+
