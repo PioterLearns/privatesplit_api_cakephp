@@ -1,14 +1,13 @@
- - Removed <ini name="apc.enable_cli" value="1"/> from phpunit.xml.dist, as it was causing warnings.
- For now I set it permanently in my .ini
- - Table tests
- - figure out static code analysis
- - think about some functionality that would require playing with routes. Maybe some "double parameters"?
+ - 0.4 Table tests
+ - 0.4 figure out static code analysis
+ - 0.4 think about some functionality that would require playing with routes. Maybe some "double parameters"?
     /buckets/{bucket_id}/{droplet_id}. This would also give me a chance to go through a composite db key flow.
- - add some advanced query logic, to play with ORM more
- - go again through https://book.cakephp.org/5.x/tutorials-and-examples/cms/tags-and-users.html as I've pretty much just
+ - 0.4 add some advanced query logic, to play with ORM more
+ - 0.4 go again through https://book.cakephp.org/5.x/tutorials-and-examples/cms/tags-and-users.html as I've pretty much just
     flipped through it, to get to auth part
+ - 0.4 refactor the more complex flows (probably as part of adding db transactions)
+ - 0.4 add tests to Utility tools (move some existing integration tests used to do unit test jobs, like balance checks)
+ - 0.4 add some negative tests for file upload
 
-
- - refactor the more complex flows (probably as part of adding db transactions)
- - add tests to Utility tools (move some existing integration tests used to do unit test jobs, like balance checks)
- - add some negative tests for file upload
+ - 0.x Removed <ini name="apc.enable_cli" value="1"/> from phpunit.xml.dist, as it was causing warnings.
+ For now I set it permanently in my .ini

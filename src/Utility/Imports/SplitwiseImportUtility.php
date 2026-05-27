@@ -20,7 +20,7 @@ class SplitwiseImportUtility implements ImportUtilityInterface
 
         //process headers
         $headers = fgetcsv($resource, escape: '');
-        //todo 0.? for now we're trusting the csv format will not change...
+        //todo 0.x for now we're trusting the csv format will not change...
         // This is a bit hacky, but I do plan to re-write this, so for now it will work
         if (isset($headers[7])) {
             throw new BadRequestException('Max 3 people groups allowed');

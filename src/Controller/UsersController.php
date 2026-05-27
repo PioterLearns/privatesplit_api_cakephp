@@ -45,8 +45,8 @@ class UsersController extends AppController
      */
     public function register()
     {
-        //todo I don't get why this is created if !post, but I'll think about it later
-        //todo validation
+        //todo 0.3 I don't get why this is created if !post, but I'll think about it later
+        //todo 0.3 validation
         $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
@@ -54,7 +54,7 @@ class UsersController extends AppController
                 $this->set('user', $user);
                 $this->viewBuilder()->setOption('serialize', 'user');
             }
-            //todo error handling needs custom views?
+            //todo 0.3 error handling needs custom views?
         }
     }
 
