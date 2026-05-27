@@ -6,21 +6,16 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Droplet Entity
+ * Session Entity
  *
  * @property int $id
- * @property int $bucket_id
  * @property int $user_id
- * @property string $name
- * @property string $amount
- * @property bool $expense
+ * @property string $token
  * @property \Cake\I18n\DateTime $created
- * @property \Cake\I18n\DateTime $modified
  *
- * @property \App\Model\Entity\Bucket $bucket
  * @property \App\Model\Entity\User $user
  */
-class Droplet extends Entity
+class Session extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -32,9 +27,15 @@ class Droplet extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'name' => true,
-        'amount' => true,//todo 0.3 changing this requires an update in bucket. If we can't force this somehow - remove this
-        'expense' => true,//todo 0.3 changing this requires an update in bucket. If we can't force this somehow - remove this
-        'occurred' => true,
+        'token' => true,
+        'created' => true,
+    ];
+
+    /**
+     * Fields that are excluded from JSON versions of the entity.
+     *
+     * @var array<string>
+     */
+    protected array $_hidden = [
     ];
 }

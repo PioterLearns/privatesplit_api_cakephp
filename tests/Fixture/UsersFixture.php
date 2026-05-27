@@ -32,6 +32,13 @@ class UsersFixture extends TestFixture
                 'created' => '2026-01-01 00:00:00',
                 'modified' => '2026-01-01 00:00:00',
             ],
+            [
+                'id' => 3,
+                'username' => 'Charlie',
+                'password' => password_hash('notsosecret', PASSWORD_DEFAULT),
+                'created' => '2026-01-01 00:00:00',
+                'modified' => '2026-01-01 00:00:00',
+            ],
         ];
         parent::init();
     }

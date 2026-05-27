@@ -47,7 +47,7 @@ class BucketsTable extends Table
 
         $this->addBehavior('Timestamp');
 
-        //todo "Target table can be inferred by its name, which is provided in the
+        //todo 0.x "Target table can be inferred by its name, which is provided in the
         //     * first argument, or you can either pass the to be instantiated or
         //     * an instance of it directly."
         // sure is a sentence:D Consider fixing that upstream as well

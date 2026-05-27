@@ -25,6 +25,7 @@ class BucketsControllerTest extends TestCase
     protected array $fixtures = [
         'app.Buckets',
         'app.Users',
+        'app.Sessions',
     ];
 
     /**
@@ -35,9 +36,11 @@ class BucketsControllerTest extends TestCase
      */
     public function testIndex_correctSessionProvided_responseOK(): void
     {
-        //todo provide session
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userAToken',
+            ],
         ]);
 
         $this->get('/buckets/');
@@ -52,9 +55,11 @@ class BucketsControllerTest extends TestCase
 
     public function testIndex_incorrectSessionProvided_response401(): void
     {
-        //todo provide session
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'invalidToken',
+            ],
         ]);
 
         $this->get('/buckets/');
@@ -70,9 +75,11 @@ class BucketsControllerTest extends TestCase
      */
     public function testView_primaryUserSessionProvided_responseOK(): void
     {
-        //todo provide session
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userAToken',
+            ],
         ]);
         $id = 1;
 
@@ -83,14 +90,26 @@ class BucketsControllerTest extends TestCase
 
     public function testView_secondaryUserSessionProvided_responseOK(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $this->configRequest([
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userBToken',
+            ],
+        ]);
+        $id = 1;
+
+        $this->get('/buckets/view/' . $id);
+
+        $this->assertResponseOk();
     }
 
     public function testView_unauthorizedUserSessionProvided_responseForbidden(): void
     {
-        //todo provide session
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userCToken',
+            ],
         ]);
         $id = 1;
 
@@ -101,9 +120,11 @@ class BucketsControllerTest extends TestCase
 
     public function testView_invalidSessionProvided_responseUnauthorized(): void
     {
-        //todo provide session
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'invalidToken',
+            ],
         ]);
         $id = 1;
 
@@ -120,11 +141,14 @@ class BucketsControllerTest extends TestCase
      */
     public function testAdd_correctDataProvided_responseOK(): void
     {
+
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userAToken',
+            ],
         ]);
         $dataToAdd = [
-            'user_primary_id' => 1,//todo move to session
             'user_secondary_id' => 2,
             'name' => 'someName',
         ];
@@ -136,11 +160,14 @@ class BucketsControllerTest extends TestCase
 
     public function testAdd_sameUserIdInSecondary_response400(): void
     {
+
         $this->configRequest([
-            'headers' => ['Accept' => 'application/json'],
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userAToken',
+            ],
         ]);
         $dataToAdd = [
-            'user_primary_id' => 1,//todo move to session
             'user_secondary_id' => 1,
             'name' => 'someName',
         ];

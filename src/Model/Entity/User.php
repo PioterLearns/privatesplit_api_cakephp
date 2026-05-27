@@ -31,7 +31,7 @@ class User extends Entity
      */
     protected array $_accessible = [
         'username' => true,
-        'password' => true,//todo make sure this doesn't mean we end up with plaintext passwords
+        'password' => true,
     ];
 
     /**

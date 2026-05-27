@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+
+use Cake\Http\Exception\BadRequestException;
+use RuntimeException;
+
 /**
  * Buckets Controller
  *
@@ -17,8 +21,9 @@ class BucketsController extends AppController
      */
     public function index()
     {
-        //todo auth->filter
-        $this->set('buckets', $this->Buckets->find()->contain(['PrimaryUsers', 'SecondaryUsers']));
+        $query = $this->Buckets->find()->contain(['PrimaryUsers', 'SecondaryUsers']);
+        $this->Authorization->applyScope($query);
+        $this->set('buckets', $query);
         $this->viewBuilder()->setOption('serialize', 'buckets');
     }
 
@@ -31,8 +36,9 @@ class BucketsController extends AppController
      */
     public function view($id = null)
     {
-        //todo auth
-        $this->set('bucket', $this->Buckets->get($id, contain: ['PrimaryUsers', 'SecondaryUsers', 'Droplets']));
+        $bucket = $this->Buckets->get($id, contain: ['PrimaryUsers', 'SecondaryUsers', 'Droplets']);
+        $this->Authorization->authorize($bucket);
+        $this->set('bucket', $bucket);
         $this->viewBuilder()->setOption('serialize', 'bucket');
     }
 
@@ -43,21 +49,24 @@ class BucketsController extends AppController
      */
     public function add()
     {
-        //todo auth
-        //todo validate
+        $this->Authorization->skipAuthorization();
         $bucket = $this->Buckets->newEmptyEntity();
-        //todo research $_accessible a bit more. I think I saw some sort of "don't apply when new" somewhere in docs
         $bucket->setAccess('user_primary_id', true);
         $bucket->setAccess('user_secondary_id', true);
         if ($this->request->is('post')) {
-            $bucket = $this->Buckets->patchEntity($bucket, $this->request->getData());
+            $data = $this->request->getData();
+            $data['user_primary_id'] = (string)$this->request->getAttribute('identity')->id;
+            if ($data['user_primary_id'] === $data['user_secondary_id']) {
+                throw new BadRequestException('Cannot share bucket with yourself');
+            }
+            $bucket = $this->Buckets->patchEntity($bucket, $data);
             if ($this->Buckets->save($bucket)) {
                 $this->set('bucket', $bucket);
                 $this->viewBuilder()->setOption('serialize', 'bucket');
             }
-            //todo error handling
+            //todo 0.3 error handling
         }
-        //todo add user data to response
+        //todo 0.3 add user data to response
 //        $primaryUsers = $this->Buckets->PrimaryUsers->find('list', limit: 200)->all();
 //        $secondaryUsers = $this->Buckets->SecondaryUsers->find('list', limit: 200)->all();
 //        $this->set(compact('bucket', 'primaryUsers', 'secondaryUsers'));
