@@ -104,6 +104,17 @@ class UsersTable extends Table
             ->requirePresence('password', 'create')
             ->notEmptyString('password');
 
+        $validator
+            ->ascii('gpg')
+            //todo 0.4 it seems these rules are applied BEFORE _setX modifiers from Entity,
+            //     which is a bit weird if you ask me, since this is a DB validation, so it should be done just before
+            //     persisting the data in the form it will actually be saved. This being the way it is, allows to mess
+            //     with the data in _setX methods that may make it no longer fit validation criteria
+            //     Look into https://book.cakephp.org/5.x/orm/table-objects.html#beforerules
+//            ->minLength('gpg', 40)
+//            ->maxLength('gpg', 64)
+            ->requirePresence('gpg', 'create');
+
         return $validator;
     }
 

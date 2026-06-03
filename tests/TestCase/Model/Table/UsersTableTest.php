@@ -63,6 +63,7 @@ class UsersTableTest extends TestCase
         $validData = [
             'username' => 'newuser',
             'password' => 'pass',
+            'gpg' => 'this should probably be validated...', //todo 0.4 validation
         ];
 
         $user = $this->Users->newEmptyEntity();
@@ -106,6 +107,7 @@ class UsersTableTest extends TestCase
         $data = [
             'username' => 'newuser',
             'password' => 'pass',
+            'gpg' => 'this should probably be validated...', //todo 0.4 validation
         ];
 
         $user = $this->Users->newEmptyEntity();

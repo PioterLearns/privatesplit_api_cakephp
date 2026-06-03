@@ -18,8 +18,19 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Event\DatabaseEncryptor;
 use App\Identifier\Resolver\SessionResolver;
 use App\Middleware\HostHeaderMiddleware;
+use App\Service\Encryption\GpgService;
+use Authentication\AuthenticationService;
+use Authentication\AuthenticationServiceInterface;
+use Authentication\AuthenticationServiceProviderInterface;
+use Authentication\Middleware\AuthenticationMiddleware;
+use Authorization\AuthorizationService;
+use Authorization\AuthorizationServiceInterface;
+use Authorization\AuthorizationServiceProviderInterface;
+use Authorization\Middleware\AuthorizationMiddleware;
+use Authorization\Policy\OrmResolver;
 use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
 use Cake\Datasource\FactoryLocator;
@@ -27,21 +38,11 @@ use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Event\EventManagerInterface;
 use Cake\Http\BaseApplication;
 use Cake\Http\Middleware\BodyParserMiddleware;
-use Cake\Http\Middleware\CsrfProtectionMiddleware;
 use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
-use Authentication\AuthenticationService;
-use Authentication\AuthenticationServiceInterface;
-use Authentication\AuthenticationServiceProviderInterface;
-use Authentication\Middleware\AuthenticationMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
-use Authorization\AuthorizationService;
-use Authorization\AuthorizationServiceInterface;
-use Authorization\AuthorizationServiceProviderInterface;
-use Authorization\Middleware\AuthorizationMiddleware;
-use Authorization\Policy\OrmResolver;
 
 /**
  * Application setup class.
@@ -126,7 +127,13 @@ class Application extends BaseApplication
      */
     public function services(ContainerInterface $container): void
     {
-        // Allow your Tables to be dependency injected
+        //todo 0.4 figure out why configuration wiring isn't working as expected; addArgument should not be required?
+        $container->add(GpgService::class)
+            ->addArgument(Configure::read('Gpg.default.keyFingerprint'))
+            ->addArgument(Configure::read('Gpg.default.keyPassword'))
+            ->addArgument(Configure::read('Gpg.default.dir'))
+            ->addArgument(Configure::read('Gpg.errorMode'));
+        // Allow your Tables to be dependency injected ... sadly it seems this means Tables can be injected into stuff, not that we can inject into Tables... :(
         //$container->delegate(new \Cake\ORM\Locator\TableContainer());
     }
 
@@ -139,7 +146,7 @@ class Application extends BaseApplication
      */
     public function events(EventManagerInterface $eventManager): EventManagerInterface
     {
-        // $eventManager->on(new SomeCustomListenerClass());
+         $eventManager->on(new DatabaseEncryptor($this->getContainer()->get(GpgService::class)));
 
         return $eventManager;
     }
@@ -149,7 +156,6 @@ class Application extends BaseApplication
         $service = new AuthenticationService();
 
         // Define where users should be redirected to when they are not authenticated
-        //todo 0.3 response leaks internal data. Will probably get turned off by some "debug" option for production?
         $service->setConfig([
             'unauthenticatedRedirect' => null,
         ]);
@@ -183,6 +189,7 @@ class Application extends BaseApplication
 
     public function getAuthorizationService(ServerRequestInterface $request): AuthorizationServiceInterface
     {
+        //todo 0.4 is this some tutorial leftovers? I know I'm using a custom SessionResolver...
         $resolver = new OrmResolver();
 
         return new AuthorizationService($resolver);

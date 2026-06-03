@@ -10,10 +10,8 @@ Roadmap:
 - [x] 0.2 MVP - Deadline: 2026-05-27 (Wed)
  - Authentication and Authorization
  - Splitwise data import functionality
-- [ ] 0.3 Frontend readiness - Deadline: 2026-06-03 (Wed)
- - GPG encryption for data (see [ADR-001](https://github.com/PioterLearns/privatesplit_api_cakephp/blob/roadmap-update/design/ADR/001.EncryptionScope.md))
- - Dependency Injection
- - Add missing CRUD methods
+- [x] 0.2.1 Encryption [ADR-001](https://github.com/PioterLearns/privatesplit_api_cakephp/blob/roadmap-update/design/ADR/001.EncryptionScope.md)
+- [ ] 0.3 Frontend readiness - Deadline: ~~2026-06-03 (Wed)~~ 2026-06-05 (Fri)
  - Clean up controllers, and settle on initial routes (start of BC effort)
  - Produce OpenAPI documentation
  - Commence work on frontend - heavily AI supported JS project. (I'm not very comfortable using AI for technology I don't know, but I am here to learn, so might as well give it a try)

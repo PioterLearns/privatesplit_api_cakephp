@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use App\Service\Encryption\Encryptable;
+use App\Service\Encryption\GpgService;
 use Cake\ORM\Entity;
 
 /**
@@ -20,7 +23,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Bucket $bucket
  * @property \App\Model\Entity\User $user
  */
-class Droplet extends Entity
+class Droplet extends Entity implements Encryptable
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -37,4 +40,53 @@ class Droplet extends Entity
         'expense' => true,//todo 0.3 changing this requires an update in bucket. If we can't force this somehow - remove this
         'occurred' => true,
     ];
+
+    public function encryptBeforeSave(GpgService $gpgService, array $encryptTo): void
+    {
+        //always encrypt "amount"; allow system to decrypt
+        if ($this->isDirty('amount')) {
+            $this->set(
+                'amount',
+                $gpgService->encrypt(
+                    $this->amount,
+                    $encryptTo,
+                    true
+                )
+            );
+        }
+
+        //encrypt "name" when it comes from imports (unencrypted); Do NOT allow system to decrypt
+        if (
+            $this->isNew()
+            && false === $gpgService->isEncrypted($this->name)
+        ) {
+            $this->set(
+                'name',
+                $gpgService->encrypt(
+                    $this->name,
+                    $encryptTo
+                )
+            );
+        }
+    }
+
+    public function encryptToIdExtractorSql(): string
+    {
+        return "
+            SELECT u.gpg
+            FROM users u
+                 JOIN buckets b ON b.user_primary_id = u.id
+                                OR b.user_secondary_id = u.id
+            WHERE b.id = {$this->bucket_id}";
+    }
+
+    public function decrypt(GpgService $gpgService): void
+    {
+        if ($gpgService->isEncrypted($this->amount)) {
+            $this->set(
+                'amount',
+                $gpgService->decrypt($this->amount)
+            );
+        }
+    }
 }

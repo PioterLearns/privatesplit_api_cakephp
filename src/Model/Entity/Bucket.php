@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use App\Service\Encryption\Encryptable;
+use App\Service\Encryption\GpgService;
 use Cake\ORM\Entity;
 
 /**
@@ -19,7 +22,7 @@ use Cake\ORM\Entity;
  *
  * @property \App\Model\Entity\Droplet[] $droplets
  */
-class Bucket extends Entity
+class Bucket extends Entity implements Encryptable
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -33,4 +36,55 @@ class Bucket extends Entity
     protected array $_accessible = [
         'name' => true,
     ];
+
+    public function encryptBeforeSave(GpgService $gpgService, array $encryptTo): void
+    {
+        //always encrypt "balance"; allow system to decrypt
+        if (
+            $this->isDirty('balance')
+            || $this->isNew()
+        ) {
+            $this->set(
+                'balance',
+                $gpgService->encrypt(
+                    $this->balance ?? '0',
+                    $encryptTo,
+                    true
+                )
+            );
+        }
+
+        //encrypt "name" when it comes from imports (unencrypted); Do NOT allow system to decrypt
+        if (
+            $this->isNew()
+            && false === $gpgService->isEncrypted($this->name)
+        ) {
+            $this->set(
+                'name',
+                $gpgService->encrypt(
+                    $this->name,
+                    $encryptTo
+                )
+            );
+        }
+    }
+
+    public function encryptToIdExtractorSql(): string
+    {
+        return "
+            SELECT u.gpg
+            FROM users u
+            WHERE u.id = {$this->user_primary_id}
+               OR u.id = {$this->user_secondary_id}";
+    }
+
+    public function decrypt(GpgService $gpgService): void
+    {
+        if ($gpgService->isEncrypted($this->balance)) {
+            $this->set(
+                'balance',
+                $gpgService->decrypt($this->balance)
+            );
+        }
+    }
 }

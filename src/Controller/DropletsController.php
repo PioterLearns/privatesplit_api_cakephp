@@ -47,11 +47,11 @@ class DropletsController extends AppController
             $droplet->setAccess('expense', true);
             $data['user_id'] = (string)$this->request->getAttribute('identity')->id;
             $droplet = $this->Droplets->patchEntity($droplet, $data);
+            $balanceCalculator = new BalanceCalculator();
+            $newBalance = $balanceCalculator->calculateNewBucketBalance($bucket, $droplet);
             if ($this->Droplets->save($droplet)) {
                 //todo 0.3 db transactions?
                 //todo 0.3 DI
-                $balanceCalculator = new BalanceCalculator();
-                $newBalance = $balanceCalculator->calculateNewBucketBalance($bucket, $droplet);
                 $bucket->setAccess('balance', true);
                 $this->Droplets->Buckets->patchEntity($bucket, ['balance' => $newBalance]);
                 if (false === $this->Droplets->Buckets->save($bucket)) {

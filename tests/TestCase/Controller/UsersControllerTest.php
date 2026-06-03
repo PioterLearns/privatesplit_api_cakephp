@@ -43,25 +43,13 @@ class UsersControllerTest extends TestCase
                 'Authorization' => 'userAToken'
             ],
         ]);
-        //todo feels silly to me, but that's how they do it in
-        // https://book.cakephp.org/6.x/development/testing.html#testing-a-json-responding-controller
-        // rewrite this to something more sensible, like checking if valid Json + specific value comparisons.
-        // with this even changed order of fields will make the test go belly up. At least canonicalize it...
-        $expected = [
-            'id' => 1,
-            'username' => 'Alice',
-            'created' => '2026-01-01T00:00:00+00:00',
-            'modified' => '2026-01-01T00:00:00+00:00',
-            "droplets" => [],
-            "secondary_buckets" => [],
-            "primary_buckets" => []
-        ];
-        $expected = json_encode($expected, JSON_PRETTY_PRINT);
+
+        $expectedId = 1;
 
         $this->get('/users/me');
 
         $this->assertResponseOk();
-        $this->assertEquals($expected, (string)$this->_response->getBody());
+        $this->assertEquals($expectedId, json_decode((string)$this->_response->getBody(), true)['id']);
     }
 
     public function testMe_invalidAuthenticationProvided_responseUnauthorized(): void
@@ -84,17 +72,33 @@ class UsersControllerTest extends TestCase
      * @return void
      * @link \App\Controller\UsersController::register()
      */
-    public function testAdd_correctDataProvided_responseOK(): void
+    public function testRegister_correctDataProvided_responseOK(): void
     {
+        $testKey = <<<PUBKEY
+                     -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+                     mDMEahz5PxYJKwYBBAHaRw8BAQdAt6qeBK1vnb2DeUWnS+siUKtpBXce9qUja3C9
+                     oewOr0q0B1Rlc3RBUEmIkAQTFgoAOBYhBO48kLS36td1mdcrGboioyVzNYOrBQJq
+                     HPk/AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJELoioyVzNYOryWoBAKtX
+                     Kqyqxc8mMYskB4tuK9eWpEX9hbnnEeFmhntnyQvNAP9qWNXgaanh4sHNmZOm1WY3
+                     gGAqOWQCNWKUiUWeCGsmArg4BGoc+T8SCisGAQQBl1UBBQEBB0CQfsCi4ouPwjvJ
+                     QiVdO/LsQcNsMXNIzI35vq3WAa4SMQMBCAeIeAQYFgoAIBYhBO48kLS36td1mdcr
+                     GboioyVzNYOrBQJqHPk/AhsMAAoJELoioyVzNYOrZokA/1GeIVOqtixzaS08xrbT
+                     e1PVKj2N1xkbB2+WpbDW4oAQAQDM4M4pDqzA6ne1caybb4Pl9KCU6ViSpv7Q+QkW
+                     epCRBg==
+                     =2xWK
+                     -----END PGP PUBLIC KEY BLOCK-----
+                     PUBKEY;
+
         $this->configRequest([
             'headers' => [
-                'Accept' => 'application/json',
-                'Authorization' => 'userAToken',
+                'Accept' => 'application/json'
             ],
         ]);
         $dataToAdd = [
             'username' => 'newuser',
-            'password' => 'pass'
+            'password' => 'pass',
+            'gpg' => $testKey
         ];
 
         $this->post('/users/register', $dataToAdd);

@@ -13,6 +13,7 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string $username
  * @property string $password
+ * @property string $gpg
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
  *
@@ -32,6 +33,7 @@ class User extends Entity
     protected array $_accessible = [
         'username' => true,
         'password' => true,
+        'gpg' => true,
     ];
 
     /**
@@ -45,7 +47,7 @@ class User extends Entity
 
     protected function _setPassword(string $password): ?string
     {
-        if (mb_strlen($password) > 0) {
+        if ($password !== '') {
             return (new DefaultPasswordHasher())->hash($password);
         }
         return null;
