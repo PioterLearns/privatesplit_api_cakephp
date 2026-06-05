@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Model\Entity\Droplet;
 use App\Utility\BalanceCalculator;
+use SwaggerBake\Lib\Attribute\OpenApiResponse;
 
 /**
  * Droplets Controller
@@ -15,6 +15,10 @@ use App\Utility\BalanceCalculator;
 class DropletsController extends AppController
 {
 
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
      * View method
      *
@@ -30,6 +34,13 @@ class DropletsController extends AppController
         $this->viewBuilder()->setOption('serialize', 'droplet');
     }
 
+    #[OpenApiResponse(
+        statusCode: '201',
+    )]
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
      * Add method
      *
@@ -37,32 +48,28 @@ class DropletsController extends AppController
      */
     public function add()
     {
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-            $bucket = $this->Droplets->Buckets->get($data['bucket_id']);
-            $this->Authorization->authorize($bucket);
-            $droplet = $this->Droplets->newEmptyEntity();
-            $droplet->setAccess('user_id', true);
-            $droplet->setAccess('bucket_id', true);
-            $droplet->setAccess('expense', true);
-            $data['user_id'] = (string)$this->request->getAttribute('identity')->id;
-            $droplet = $this->Droplets->patchEntity($droplet, $data);
-            $balanceCalculator = new BalanceCalculator();
-            $newBalance = $balanceCalculator->calculateNewBucketBalance($bucket, $droplet);
-            if ($this->Droplets->save($droplet)) {
-                //todo 0.3 db transactions?
-                //todo 0.3 DI
-                $bucket->setAccess('balance', true);
-                $this->Droplets->Buckets->patchEntity($bucket, ['balance' => $newBalance]);
-                if (false === $this->Droplets->Buckets->save($bucket)) {
-                    //todo 0.3 rollback non-existing transaction ;)
-                }
-                //todo ? add new balance to response?
-                $this->set('droplet', $droplet);
-                $this->viewBuilder()->setOption('serialize', 'droplet');
+        $data = $this->request->getData();
+        $bucket = $this->Droplets->Buckets->get($data['bucket_id']);
+        $this->Authorization->authorize($bucket);
+        $droplet = $this->Droplets->newEmptyEntity();
+        $droplet->setAccess('user_id', true);
+        $droplet->setAccess('bucket_id', true);
+        $droplet->setAccess('expense', true);
+        $data['user_id'] = (string)$this->request->getAttribute('identity')->id;
+        $droplet = $this->Droplets->patchEntity($droplet, $data);
+        $balanceCalculator = new BalanceCalculator();
+        $newBalance = $balanceCalculator->calculateNewBucketBalance($bucket, $droplet);
+        if ($this->Droplets->save($droplet)) {
+            //todo 0.4 db transactions
+            $bucket->setAccess('balance', true);
+            $this->Droplets->Buckets->patchEntity($bucket, ['balance' => $newBalance]);
+            if (false === $this->Droplets->Buckets->save($bucket)) {
+                //todo 0.4 rollback non-existing transaction ;)
             }
-            //todo 0.3 error handling https://book.cakephp.org/5.x/development/errors.html
+            $this->set('droplet', $droplet);
+            $this->viewBuilder()->setOption('serialize', 'droplet');
         }
+        //todo 0.4 201 response
     }
 
 }

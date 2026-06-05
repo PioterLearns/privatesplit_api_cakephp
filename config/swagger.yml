@@ -1,0 +1,30 @@
+openapi: "3.2.0"
+info:
+  version: 0.1.0
+  title: PrivateSplit - Privacy focused cost sharing API
+  license:
+    name: GNU Affero General Public License v3.0 or later
+    identifier: AGPL-3.0-or-later
+servers:
+  - url: /api/
+paths:
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    Session:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        token:
+          type: string
+        created:
+          type: string
+          format: date-time

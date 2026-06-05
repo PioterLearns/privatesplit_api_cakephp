@@ -37,5 +37,6 @@ class Session extends Entity
      * @var array<string>
      */
     protected array $_hidden = [
+        'id'
     ];
 }

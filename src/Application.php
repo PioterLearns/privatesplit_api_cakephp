@@ -113,7 +113,9 @@ class Application extends BaseApplication
         // https://book.cakephp.org/5/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
 //            ->add(new CsrfProtectionMiddleware([
 //                'httponly' => true,
-//            ])); todo 0.3 re-enable! Disabled temporarily to not further derail tutorial progress, with upcoming deadline
+//            ])); todo 0.4 We don't reeeeeally need CSRF protection, since we switched to Tokens,
+//                  but I'd still like to re-enable it later, just to see how Cake handles it.
+//                  Also, additional layer of protection shouldn't hurt ;)
         ;
         return $middlewareQueue;
     }
@@ -173,12 +175,7 @@ class Application extends BaseApplication
             ],
         ]);
         $service->loadAuthenticator('Authentication.Form', [
-            'loginUrl' => [
-                'prefix' => false,
-                'plugin' => null,
-                'controller' => 'Users',
-                'action' => 'login',
-            ],
+            'loginUrl' => '/users/login',
             'identifier' => [
                 'className' => 'Authentication.Password',
             ],

@@ -76,13 +76,11 @@ class DropletsTable extends Table
 
         $validator
             ->ascii('name')
-            ->maxLength('name', 255)
             ->requirePresence('name', 'create')
             ->notEmptyString('name');
 
         $validator
-            ->numeric('amount')
-            ->maxLength('amount', 255)
+            ->ascii('amount')
             ->requirePresence('amount', 'create')
             ->notEmptyString('amount');
 

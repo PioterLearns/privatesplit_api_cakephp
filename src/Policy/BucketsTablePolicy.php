@@ -18,7 +18,6 @@ class BucketsTablePolicy
      */
     public function scopeIndex($user, $query)
     {
-        //todo 0.3 https://book.cakephp.org/authorization/3/component.html#applying-policy-scopes ?
         return $query->where(
             [
                 'OR' => [

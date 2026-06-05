@@ -27,8 +27,6 @@ class UsersControllerTest extends TestCase
         'app.Sessions',
     ];
 
-    protected const DATA_DIR = __DIR__ . '/../../Fixture/ImportFiles/';
-
     /**
      * Test view method
      *
@@ -101,39 +99,8 @@ class UsersControllerTest extends TestCase
             'gpg' => $testKey
         ];
 
-        $this->post('/users/register', $dataToAdd);
+        $this->post('/users', $dataToAdd);
 
         $this->assertResponseOk();
     }
-
-    public function testImportData_ValidDataProvided_responseOK(): void
-    {
-        $filePath = self::DATA_DIR . 'splitwise.valid.csv';
-        $attachment = new \Laminas\Diactoros\UploadedFile(
-            $filePath,
-            filesize($filePath),
-            \UPLOAD_ERR_OK,
-            'whatever.csv',
-            'text/csv',
-        );
-        $postData = [
-            'type' => 'splitwise',
-            'bucket_name' => 'TestBucket',
-            'external_self_id' => 'primary user',
-            'secondary_user_id' => 2,
-            'primary_user_share' => 50,
-            'attachment' => $attachment,
-        ];
-        $this->configRequest([
-            'headers' => [
-                'Accept' => 'application/json',
-                'Authorization' => 'userAToken',
-            ]
-        ]);
-
-        $this->post('/users/importData', $postData);
-
-        $this->assertResponseOk();
-    }
-
 }

@@ -87,14 +87,12 @@ class BucketsTable extends Table
 
         $validator
             ->ascii('name')
-            ->maxLength('name', 255)
             ->requirePresence('name', 'create')
             ->notEmptyString('name');
 
         //no plans to enforce any currency rules for now = no additional validation
         $validator
             ->numeric('balance')
-            ->maxLength('balance', 255)
             ->notEmptyString('balance');
 
         $validator

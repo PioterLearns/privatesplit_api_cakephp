@@ -8,7 +8,7 @@ class BalanceCalculatorTest extends TestCase
 {
 
 
-    //todo 0.3 change percentages in these tests from 50% to something else, so that they actually test proper split
+    //todo 0.4 change percentages in these tests from 50% to something else, so that they actually test proper split
     // also, re-write them from old e2e model
 //    public function testAdd_primaryUserAddedExpense_amountProportionallyIncreasesBucketBalance(): void
 //    {

@@ -11,10 +11,10 @@ Roadmap:
  - Authentication and Authorization
  - Splitwise data import functionality
 - [x] 0.2.1 Encryption [ADR-001](https://github.com/PioterLearns/privatesplit_api_cakephp/blob/roadmap-update/design/ADR/001.EncryptionScope.md)
-- [ ] 0.3 Frontend readiness - Deadline: ~~2026-06-03 (Wed)~~ 2026-06-05 (Fri)
+- [x] 0.3 Frontend readiness - Deadline: ~~2026-06-03 (Wed)~~ 2026-06-05 (Fri)
  - Clean up controllers, and settle on initial routes (start of BC effort)
  - Produce OpenAPI documentation
- - Commence work on frontend - heavily AI supported JS project. (I'm not very comfortable using AI for technology I don't know, but I am here to learn, so might as well give it a try)
+ - Commence work on frontend - https://github.com/PioterLearns/privatesplit_js_react
 - [ ] 0.4 Hardening pass - Deadline: 2026-06-30
  - DB transaction
  - Test coverage
@@ -24,6 +24,7 @@ Roadmap:
  - Multi user buckets
  - Arbitrary precision amounts with strict balance control
 
+Branching projects:
+- Web client (React with extended AI support) (https://github.com/PioterLearns/privatesplit_js_react)
 Possible connected projects for future:
-1. ~~Proper Web client (second attempt at learning proper frontend)~~ (Already planned)
-2. Android client (learning Kotlin)
+- Android client (learning Kotlin)
