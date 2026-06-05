@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Model\Entity\Droplet;
 use App\Utility\BalanceCalculator;
 
 /**
@@ -50,18 +49,15 @@ class DropletsController extends AppController
             $balanceCalculator = new BalanceCalculator();
             $newBalance = $balanceCalculator->calculateNewBucketBalance($bucket, $droplet);
             if ($this->Droplets->save($droplet)) {
-                //todo 0.3 db transactions?
-                //todo 0.3 DI
+                //todo 0.4 db transactions
                 $bucket->setAccess('balance', true);
                 $this->Droplets->Buckets->patchEntity($bucket, ['balance' => $newBalance]);
                 if (false === $this->Droplets->Buckets->save($bucket)) {
-                    //todo 0.3 rollback non-existing transaction ;)
+                    //todo 0.4 rollback non-existing transaction ;)
                 }
-                //todo ? add new balance to response?
                 $this->set('droplet', $droplet);
                 $this->viewBuilder()->setOption('serialize', 'droplet');
             }
-            //todo 0.3 error handling https://book.cakephp.org/5.x/development/errors.html
         }
     }
 

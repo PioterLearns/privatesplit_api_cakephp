@@ -95,7 +95,7 @@ class UsersTable extends Table
             ->maxLength('username', 255)
             ->requirePresence('username', 'create')
             ->notEmptyString('username')
-            //todo 0.3 read-up on https://book.cakephp.org/5.x/orm/validation.html#validation-providers ('provider' => 'table'?)
+            //todo 0.4 read-up on https://book.cakephp.org/5.x/orm/validation.html#validation-providers ('provider' => 'table'?)
             ->add('username', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator

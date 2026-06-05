@@ -17,6 +17,8 @@ class BucketsControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
+    protected const DATA_DIR = __DIR__ . '/../../Fixture/ImportFiles/';
+
     /**
      * Fixtures
      *
@@ -141,7 +143,6 @@ class BucketsControllerTest extends TestCase
      */
     public function testAdd_correctDataProvided_responseOK(): void
     {
-
         $this->configRequest([
             'headers' => [
                 'Accept' => 'application/json',
@@ -160,7 +161,6 @@ class BucketsControllerTest extends TestCase
 
     public function testAdd_sameUserIdInSecondary_response400(): void
     {
-
         $this->configRequest([
             'headers' => [
                 'Accept' => 'application/json',
@@ -175,5 +175,35 @@ class BucketsControllerTest extends TestCase
         $this->post('/buckets/add', $dataToAdd);
 
         $this->assertResponseCode(400, "Cannot share a bucket with yourself");
+    }
+
+    public function testImportData_ValidDataProvided_responseOK(): void
+    {
+        $filePath = self::DATA_DIR . 'splitwise.valid.csv';
+        $attachment = new \Laminas\Diactoros\UploadedFile(
+            $filePath,
+            filesize($filePath),
+            \UPLOAD_ERR_OK,
+            'whatever.csv',
+            'text/csv',
+        );
+        $postData = [
+            'type' => 'splitwise',
+            'bucket_name' => 'TestBucket',
+            'external_self_id' => 'primary user',
+            'secondary_user_id' => 2,
+            'primary_user_share' => 50,
+            'attachment' => $attachment,
+        ];
+        $this->configRequest([
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'userAToken',
+            ]
+        ]);
+
+        $this->post('/buckets/importData', $postData);
+
+        $this->assertResponseOk();
     }
 }
