@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -9,7 +10,8 @@ use App\Service\Encryption\GpgService;
 use App\Utility\BalanceCalculator;
 use App\Utility\Imports\ImportUtilityFactory;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\MethodNotAllowedException;
+use SwaggerBake\Lib\Attribute\OpenApiOperation;
+use SwaggerBake\Lib\Attribute\OpenApiResponse;
 
 /**
  * Buckets Controller
@@ -18,8 +20,12 @@ use Cake\Http\Exception\MethodNotAllowedException;
  */
 class BucketsController extends AppController
 {
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
-     * Index method
+     * List buckets that user is participating in
      *
      * @return \Cake\Http\Response|null|void
      */
@@ -31,12 +37,16 @@ class BucketsController extends AppController
         $this->viewBuilder()->setOption('serialize', 'buckets');
     }
 
+
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
-     * View method
+     * View bucket details
      *
      * @param string|null $id Bucket id.
      * @return \Cake\Http\Response|null|void
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function view($id = null)
     {
@@ -46,6 +56,13 @@ class BucketsController extends AppController
         $this->viewBuilder()->setOption('serialize', 'bucket');
     }
 
+    #[OpenApiResponse(
+        statusCode: '201',
+    )]
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
      * Add method
      *
@@ -57,27 +74,36 @@ class BucketsController extends AppController
         $bucket = $this->Buckets->newEmptyEntity();
         $bucket->setAccess('user_primary_id', true);
         $bucket->setAccess('user_secondary_id', true);
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-            $data['user_primary_id'] = (string)$this->request->getAttribute('identity')->id;
-            if ($data['user_primary_id'] === $data['user_secondary_id']) {
-                throw new BadRequestException('Cannot share bucket with yourself');
-            }
-            $bucket = $this->Buckets->patchEntity($bucket, $data);
-            if ($this->Buckets->save($bucket)) {
-                $this->set('bucket', $bucket);
-                $this->viewBuilder()->setOption('serialize', 'bucket');
-            }
-            //todo 0.4 error handling
+        $data = $this->request->getData();
+        $data['user_primary_id'] = (string)$this->request->getAttribute('identity')->id;
+        if ($data['user_primary_id'] === $data['user_secondary_id']) {
+            throw new BadRequestException('Cannot share bucket with yourself');
         }
+        $bucket = $this->Buckets->patchEntity($bucket, $data);
+        if ($this->Buckets->save($bucket)) {
+            $this->set('bucket', $bucket);
+            $this->viewBuilder()->setOption('serialize', 'bucket');
+        }
+        //todo 0.4 error handling
+        //todo 0.4 201 handling
     }
 
+    #[OpenApiOperation(
+        summary: 'Import external data',
+        description: 'Parses data from a provided export files, from other services (for not only Splitwise)',
+        tagNames: ['Buckets', 'Droplets'],
+    )]
+    #[OpenApiResponse(schemaType: 'array', ref: '#/components/schemas/Bucket')]
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
+    /**
+     * @param GpgService $gpgService
+     * @return void
+     */
     public function importData(GpgService $gpgService)
     {
-        //todo 0.4 see if this is(post) business can be moved to middleware, or somewhere
-        if (false === $this->request->is('post')) {
-            throw new MethodNotAllowedException();
-        }
         $this->Authorization->skipAuthorization();
         $data = $this->request->getData();
         $importUtilityFactory = new ImportUtilityFactory();
@@ -125,6 +151,9 @@ class BucketsController extends AppController
 
         $this->set('buckets', $buckets);
         $this->viewBuilder()->setOption('serialize', 'buckets');
+        //todo 0.4 20x response. Not sure about using 201 for a potential synchronous import that creates multiple
+        // resources, as 201 requires Location header, and I don't feel like implementing a method that fetches
+        // multiple buckets just for that. I'll think about it later
     }
 
     private function hydrateBucket(Bucket $bucket, array $dropletsData): void

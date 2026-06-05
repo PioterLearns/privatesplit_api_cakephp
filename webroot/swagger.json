@@ -1,0 +1,828 @@
+{
+    "openapi": "3.2.0",
+    "info": {
+        "version": "0.1.0",
+        "title": "PrivateSplit - Privacy focused cost sharing API",
+        "license": {
+            "name": "GNU Affero General Public License v3.0 or later",
+            "identifier": "AGPL-3.0-or-later"
+        }
+    },
+    "servers": [
+        {
+            "url": "\/api\/"
+        }
+    ],
+    "paths": {
+        "\/buckets": {
+            "get": {
+                "operationId": "buckets:index:get",
+                "summary": "List buckets that user is participating in",
+                "description": "",
+                "tags": [
+                    "Buckets"
+                ],
+                "parameters": [],
+                "responses": {
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#\/components\/schemas\/Bucket"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "buckets:add:post",
+                "summary": "Add method",
+                "description": "",
+                "tags": [
+                    "Buckets"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "required": [
+                                    "user_primary_id",
+                                    "user_secondary_id",
+                                    "name"
+                                ],
+                                "allOf": [
+                                    {
+                                        "$ref": "#\/components\/schemas\/Bucket"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Bucket"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "\/buckets\/import": {
+            "post": {
+                "operationId": "buckets:importdata:post",
+                "summary": "Import external data",
+                "description": "Parses data from a provided export files, from other services (for not only Splitwise)",
+                "tags": [
+                    "Buckets",
+                    "Droplets"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#\/components\/schemas\/Bucket"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    },
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "\/buckets\/{id}": {
+            "get": {
+                "operationId": "buckets:view:get",
+                "summary": "View bucket details",
+                "description": "",
+                "tags": [
+                    "Buckets"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "$ref": "#\/components\/schemas\/Bucket"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "\/droplets": {
+            "post": {
+                "operationId": "droplets:add:post",
+                "summary": "Add method",
+                "description": "",
+                "tags": [
+                    "Droplets"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "amount",
+                                    "expense"
+                                ],
+                                "allOf": [
+                                    {
+                                        "$ref": "#\/components\/schemas\/Droplet"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Droplet"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "\/droplets\/{id}": {
+            "get": {
+                "operationId": "droplets:view:get",
+                "summary": "View method",
+                "description": "",
+                "tags": [
+                    "Droplets"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "$ref": "#\/components\/schemas\/Droplet"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "When record not found.",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "$ref": "#\/components\/schemas\/Exception"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "\/users": {
+            "post": {
+                "operationId": "users:register:post",
+                "summary": "Register method",
+                "description": "",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "\/users\/login": {
+            "post": {
+                "operationId": "users:login:post",
+                "summary": "Login method",
+                "description": "",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Session"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "\/users\/me": {
+            "get": {
+                "operationId": "users:me:get",
+                "summary": "Fetch signed in user data",
+                "description": "",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/User"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "40x": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#\/components\/schemas\/Error"
+                                        }
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "When record not found.",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "$ref": "#\/components\/schemas\/Exception"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Bucket": {
+                "properties": {
+                    "id": {
+                        "minLength": 1,
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "user_primary_id": {
+                        "minLength": 1,
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "user_secondary_id": {
+                        "minLength": 1,
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "string"
+                    },
+                    "balance": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "string",
+                        "readOnly": true
+                    },
+                    "primary_user_share_percent": {
+                        "maximum": 100,
+                        "minLength": 1,
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "created": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "modified": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "type": "object",
+                "description": ""
+            },
+            "Droplet": {
+                "properties": {
+                    "id": {
+                        "minLength": 1,
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "bucket_id": {
+                        "minLength": 1,
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "user_id": {
+                        "minLength": 1,
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "string"
+                    },
+                    "amount": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "string"
+                    },
+                    "expense": {
+                        "minLength": 1,
+                        "type": "boolean"
+                    },
+                    "created": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "modified": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "occurred": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object",
+                "description": ""
+            },
+            "Error": {
+                "properties": {
+                    "code": {
+                        "type": "integer"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Session": {
+                "properties": {
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "token": {
+                        "type": "string"
+                    },
+                    "created": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "properties": {
+                    "id": {
+                        "minLength": 1,
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "username": {
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "type": "string"
+                    },
+                    "created": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "modified": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "gpg": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "description": ""
+            }
+        }
+    },
+    "x-swagger-bake": {
+        "components": {
+            "parameters": {
+                "paginatorPage": {
+                    "name": "page",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                        "type": "integer"
+                    }
+                },
+                "paginatorLimit": {
+                    "name": "limit",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                        "type": "integer"
+                    }
+                },
+                "paginatorSort": {
+                    "name": "sort",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                        "type": "string"
+                    }
+                },
+                "paginatorDirection": {
+                    "name": "direction",
+                    "in": "query",
+                    "required": false,
+                    "schema": {
+                        "type": "string",
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ]
+                    }
+                }
+            },
+            "schemas": {
+                "HalJson-Item": {
+                    "type": "object",
+                    "properties": {
+                        "links": {
+                            "type": "object",
+                            "properties": {
+                                "self": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "\/entity\/:id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "HalJson-Collection": {
+                    "type": "object",
+                    "properties": {
+                        "links": {
+                            "type": "object",
+                            "properties": {
+                                "self": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "\/collection"
+                                        }
+                                    }
+                                },
+                                "next": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "\/collection?page=:number"
+                                        }
+                                    }
+                                },
+                                "prev": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "\/collection?page=:number"
+                                        }
+                                    }
+                                },
+                                "first": {
+                                    "type": "object",
+                                    "properties": {
+                                        "href": {
+                                            "type": "string",
+                                            "format": "url",
+                                            "example": "\/collection?page=:number"
+                                        }
+                                    }
+                                },
+                                "properties": {
+                                    "href": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "\/collection?page=:number"
+                                    }
+                                }
+                            },
+                            "last": {
+                                "type": "object",
+                                "properties": {
+                                    "href": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "\/collection?page=:number"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "JsonLd-Item": {
+                    "type": "object",
+                    "properties": {
+                        "@id": {
+                            "type": "string",
+                            "format": "url",
+                            "example": "\/entity\/:id"
+                        },
+                        "@type": {
+                            "type": "string",
+                            "format": "url",
+                            "example": "https:\/\/schema.org\/Thing"
+                        },
+                        "@context": {
+                            "type": "string",
+                            "format": "url",
+                            "example": "\/context\/Entity"
+                        }
+                    }
+                },
+                "JsonLd-Collection": {
+                    "type": "object",
+                    "properties": {
+                        "@id": {
+                            "type": "string",
+                            "format": "url",
+                            "example": "\/entity\/:id"
+                        },
+                        "@type": {
+                            "type": "string",
+                            "format": "url",
+                            "example": "https:\/\/schema.org\/Thing"
+                        },
+                        "@context": {
+                            "type": "string",
+                            "format": "url",
+                            "example": "\/context\/Entity"
+                        },
+                        "view": {
+                            "type": "object",
+                            "properties": {
+                                "@id": {
+                                    "type": "string",
+                                    "format": "url",
+                                    "example": "\/index"
+                                },
+                                "@type": {
+                                    "type": "string",
+                                    "example": "PartialCollectionView"
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "format": "url",
+                                    "example": "\/index?page=:number"
+                                },
+                                "prev": {
+                                    "type": "string",
+                                    "format": "url",
+                                    "example": "\/index?page=:number"
+                                },
+                                "first": {
+                                    "type": "string",
+                                    "format": "url",
+                                    "example": "\/index"
+                                },
+                                "last": {
+                                    "type": "string",
+                                    "format": "url",
+                                    "example": "\/index?page=:number"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

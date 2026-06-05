@@ -85,7 +85,7 @@ class BucketsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/buckets/view/' . $id);
+        $this->get('/buckets/' . $id);
 
         $this->assertResponseOk();
     }
@@ -100,7 +100,7 @@ class BucketsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/buckets/view/' . $id);
+        $this->get('/buckets/' . $id);
 
         $this->assertResponseOk();
     }
@@ -115,7 +115,7 @@ class BucketsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/buckets/view/' . $id);
+        $this->get('/buckets/' . $id);
 
         $this->assertResponseCode(403, "Unauthorized access to Bucket");
     }
@@ -130,7 +130,7 @@ class BucketsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/buckets/view/' . $id);
+        $this->get('/buckets/' . $id);
 
         $this->assertResponseCode(401, "Unauthorized access to Bucket");
     }
@@ -154,7 +154,7 @@ class BucketsControllerTest extends TestCase
             'name' => 'someName',
         ];
 
-        $this->post('/buckets/add', $dataToAdd);
+        $this->post('/buckets/', $dataToAdd);
 
         $this->assertResponseOk();
     }
@@ -172,7 +172,7 @@ class BucketsControllerTest extends TestCase
             'name' => 'someName',
         ];
 
-        $this->post('/buckets/add', $dataToAdd);
+        $this->post('/buckets/', $dataToAdd);
 
         $this->assertResponseCode(400, "Cannot share a bucket with yourself");
     }
@@ -202,7 +202,7 @@ class BucketsControllerTest extends TestCase
             ]
         ]);
 
-        $this->post('/buckets/importData', $postData);
+        $this->post('/buckets/import', $postData);
 
         $this->assertResponseOk();
     }

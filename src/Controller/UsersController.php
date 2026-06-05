@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Model\Entity\Bucket;
 use App\Service\Encryption\GpgService;
-use App\Utility\BalanceCalculator;
-use App\Utility\Imports\ImportUtilityFactory;
-use Cake\Http\Exception\MethodNotAllowedException;
 use Cake\Utility\Security;
+use SwaggerBake\Lib\Attribute\OpenApiOperation;
+use SwaggerBake\Lib\Attribute\OpenApiResponse;
 
 /**
  * Users Controller
@@ -27,6 +25,14 @@ class UsersController extends AppController
         $this->Authorization->skipAuthorization();
     }
 
+    #[OpenApiOperation(
+        summary: 'Fetch signed in user data',
+    )]
+    #[OpenApiResponse(ref: '#/components/schemas/User')]
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
      * Me method
      *
@@ -38,8 +44,14 @@ class UsersController extends AppController
         $user = $this->request->getAttribute('identity');
         $this->set('user', $this->Users->get($user->id, contain: ['PrimaryBuckets', 'SecondaryBuckets', 'Droplets']));
         $this->viewBuilder()->setOption('serialize', 'user');
+        //todo 0.4 decide on rich vs lazy response approach. For now API docs assume just User, without related objects
     }
 
+    #[OpenApiResponse(statusCode: '201'),]
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
      * Register method
      *
@@ -47,10 +59,6 @@ class UsersController extends AppController
      */
     public function register(GpgService $gpgService)
     {
-        if (!$this->request->is('post')) {
-            throw new MethodNotAllowedException();
-        }
-
         $data = $this->request->getData();
         $data['gpg'] = $gpgService->import($data['gpg']);
         $user = $this->Users->newEmptyEntity();
@@ -59,8 +67,14 @@ class UsersController extends AppController
             $this->set('user', $user);
             $this->viewBuilder()->setOption('serialize', 'user');
         }
+        //todo 0.4 201 response
     }
 
+    #[OpenApiResponse(statusCode: '200', ref: '#/components/schemas/Session')]
+    #[OpenApiResponse(
+        statusCode: '40x',
+        ref: '#/components/schemas/Error'
+    )]
     /**
      * Login method
      *

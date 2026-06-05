@@ -99,7 +99,7 @@ class UsersControllerTest extends TestCase
             'gpg' => $testKey
         ];
 
-        $this->post('/users/register', $dataToAdd);
+        $this->post('/users', $dataToAdd);
 
         $this->assertResponseOk();
     }

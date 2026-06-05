@@ -45,7 +45,7 @@ class DropletsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/droplets/view/' . $id);
+        $this->get('/droplets/' . $id);
 
         $this->assertResponseOk();
     }
@@ -60,7 +60,7 @@ class DropletsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/droplets/view/' . $id);
+        $this->get('/droplets/' . $id);
 
         $this->assertResponseOk();
     }
@@ -75,7 +75,7 @@ class DropletsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/droplets/view/' . $id);
+        $this->get('/droplets/' . $id);
 
         $this->assertResponseCode(403, "Unauthorized access to Bucket");
     }
@@ -90,7 +90,7 @@ class DropletsControllerTest extends TestCase
         ]);
         $id = 1;
 
-        $this->get('/droplets/view/' . $id);
+        $this->get('/droplets/' . $id);
 
         $this->assertResponseCode(401, "Unauthorized access to Bucket");
     }
@@ -117,7 +117,7 @@ class DropletsControllerTest extends TestCase
             'occurred' => '2026-06-03',
         ];
 
-        $this->post('/droplets/add', $dataToAdd);
+        $this->post('/droplets', $dataToAdd);
 
         $this->assertResponseOk();
     }

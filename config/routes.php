@@ -49,35 +49,43 @@ return function (RouteBuilder $routes): void {
      */
     $routes->setRouteClass(DashedRoute::class);
 
-    $routes->scope('/', function (RouteBuilder $builder): void {
-        /*
-         * Here, we are connecting '/' (base path) to a controller called 'Pages',
-         * its action called 'display', and we pass a param to select the view file
-         * to use (in this case, templates/Pages/home.php)...
-         */
-        $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+    //todo 0.4 for now the routes are limited to what we actually implemented, which should be enough to start work
+    //  on the frontend. Will supplement missing routes as the need arises.
+    $routes->scope('/', function (RouteBuilder $builder) {
+        $builder->setExtensions(['json']);
+        $builder->resources('Users', [
+            'only' => ['create', 'login', 'me'],
+            'actions' => ['create' => 'register'],
+            'map' => [
+                'login' => [
+                    'action' => 'login',
+                    'method' => 'POST',
+                ],
+                'me' => [
+                    'action' => 'me',
+                    'method' => 'GET',
+                ],
+            ],
+        ]);
+        $builder->resources('Buckets', [
+            'only' => ['index', 'view', 'create', 'import'],
+            'map' => [
+                'import' => [
+                    'action' => 'importData',
+                    'method' => 'POST',
+                ],
+            ],
+        ]);
+        $builder->resources('Droplets', [
+            'only' => ['view', 'create'],
+        ]);
 
-        /*
-         * ...and connect the rest of 'Pages' controller's URLs.
-         */
-        $builder->connect('/pages/*', 'Pages::display');
-
-        /*
-         * Connect catchall routes for all controllers.
-         *
-         * The `fallbacks` method is a shortcut for
-         *
-         * ```
-         * $builder->connect('/{controller}', ['action' => 'index']);
-         * $builder->connect('/{controller}/{action}/*', []);
-         * ```
-         *
-         * It is NOT recommended to use fallback routes after your initial prototyping phase!
-         * See https://book.cakephp.org/5/en/development/routing.html#fallbacks-method for more information
-         */
-        $builder->fallbacks();
+        //todo 0.4 add a controller for rendering API docs?
+//        $builder->connect(
+//            '/api', # this will be the "homepage" for your Swagger or Redoc UI
+//            ['plugin' => 'SwaggerBake', 'controller' => 'Swagger', 'action' => 'index']
+//        );
     });
-
     /*
      * If you need a different set of middleware or none at all,
      * open new scope and define routes there.
